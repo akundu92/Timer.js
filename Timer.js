@@ -1,61 +1,42 @@
-export default function Timer(){
-    this._time=null;
-    this._dateStart=null;
-    this._active=false;
-}
-    
+const initilize = (duration) => ({
+  start: 0,
+  duration: duration,
+  elapsed: 0,
+  active: false,
+  complete: false,
+});
 
-    Timer.prototype.start=function(ms){
-        this._time=ms;
-        this._dateStart=new Date();
-        this._active=true;
-        return this._dateStart;
+//Binaries
+const isActive = (current) => (state) =>
+  current - state.start <= state.duration && state.active ? true : false;
+const isComplete = (current) => (state) =>
+  current - state.start >= state.duration ? true : false;
 
-    }
+//Interupts
+const start = (startTime) => (state) => ({
+  ...state,
+  start: startTime,
+  duration: state.duration - state.elapsed,
+  elapsed: 0,
+  active: true,
+});
 
-    Timer.prototype.stop=function(){
+const stop = (state) => ({ ...state, active: false });
 
-        if(this._dateStart){
-            this._dateStart=null;
-            this._active=false;
-            return true;
-        }
-        else{
-            return false;
-        }
+//Utils
+const elapsedTime = (current) => (state) => current - state.start;
 
-    }
-    
-    Timer.prototype.isActive=function(){
-        const delta=(new Date)-this._dateStart;
-        if(this._active && delta<=this._time){
-            return true
-        }
-        else{
-            this._active=false;
-            return false
-        }
-    }
+const updateTimer = (current) => (state) => ({
+  ...state,
+  elapsed: elapsedTime(current)(state),
+  active: isActive(current)(state),
+  complete: isComplete(current)(state),
+});
 
-    Timer.prototype.remaining=function(){
-        console.log(this)
-      if(this.isActive()){
-          console.log(this.isActive())
-          return this._time-((new Date)-this._dateStart);
-      }
-      else {return null}
-
-    }
-
-    Timer.prototype.elapsed=function(){
-        console.log(this)
-      if(this.isActive()){
-          console.log(this.isActive())
-          return (new Date)-this._dateStart;
-      }
-      else {return null}
-
-    }
-
-
-
+export default {
+  initilize,
+  start,
+  stop,
+  updateTimer,
+  isActive,
+};
