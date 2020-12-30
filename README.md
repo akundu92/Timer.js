@@ -1,3 +1,3 @@
 # Timer.js
 
-A Very simple function to track time. 
+A Very simple functional API to track time.
